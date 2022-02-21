@@ -9,7 +9,7 @@
 #define PLAYER 254
 #define PLAYER_UP 223
 #define PLAYER_DOWN 220
-
+#define JUMP_HEIGHT 4
 void map_print(char map[][LENGTH], int player_pos[]);
 
 int main(){
@@ -18,7 +18,8 @@ int main(){
     HANDLE hConsole = NULL;
     ShowWindow(GetConsoleWindow(), SW_SHOWMAXIMIZED);
 
-    int player_pos[] = {WIDTH/2, LENGTH/2};
+    int player_pos[] = {WIDTH/2, LENGTH-2};
+    int velocity_up = 0;
     char map[WIDTH][LENGTH] = {};
     for(int y=0; y<LENGTH; y++){
         for(int x = 0; x < WIDTH; x++){
@@ -36,14 +37,30 @@ int main(){
     system("cls");
     map_print(map, player_pos);
     while(1){
+            if(velocity_up>JUMP_HEIGHT){
+                velocity_up--;
+                map[player_pos[0]][player_pos[1]] = '\0';
+                player_pos[1]--;
+            }
+            else if(velocity_up > 0){
+                velocity_up--;
+                map[player_pos[0]][player_pos[1]] = '\0';
+                player_pos[1]++;
+            }
         if(_kbhit()) {
             switch(_getch()) {
             case 'w':
-
                 if(player_pos[1]==1){
                     continue;
                 }
+                if(velocity_up > 0){
+                    break;
+                }
+                if(velocity_up==0){
+                    velocity_up=JUMP_HEIGHT*2;
+                }
                 map[player_pos[0]][player_pos[1]] = '\0';
+                velocity_up--;
                 player_pos[1]--;
                 break;
             case 'a':
@@ -57,6 +74,9 @@ int main(){
                 if(player_pos[1]==LENGTH-2){
                     continue;
                 }
+                if(velocity_up > 0){
+                    break;
+                }
                 map[player_pos[0]][player_pos[1]] = '\0';
                 player_pos[1]++;
                 break;
@@ -68,9 +88,10 @@ int main(){
                 player_pos[0]++;
                 break;
             }
-            system("cls");
-            map_print(map, player_pos);
+
         }
+        system("cls");
+        map_print(map, player_pos);
     }
 
     return 0;
